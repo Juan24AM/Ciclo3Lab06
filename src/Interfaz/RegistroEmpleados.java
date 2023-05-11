@@ -1,6 +1,7 @@
 
 package Interfaz;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 
 
@@ -107,14 +108,55 @@ public class RegistroEmpleados extends javax.swing.JFrame {
         jTextCod.requestFocus();
     }
     
+    String VerificaCampos() 
+    {
+        if(jTextCod.getText().equals("") || jTextCod.getText().length() >=9)
+            return "Codigo";
+        else if(jTextNom.getText().equals(""))
+            return "Apellidos y Nombres";
+        else if (jTextSueldo.getText().equals("") || Double.parseDouble(jTextSueldo.getText())<=0)
+            return "Sueldo";
+        //Si todos los jText estan con datos, retornamos un texto vacio.
+        else
+            return "";
+    }
+    
     void VerDatos(){
-        
-        // Mostramos los datos de los empleados en el TextArea
-        Nodo actual = ini;
-        int num = 1;
-        while (actual != null){
-            jTextReporte.append(String.format("%4d %7s %-30s %10s\n", num++, actual.codigo, actual.nombre, actual.sueldo));
-            actual = actual.sig;
+        //Variable para recorrer la lista
+        String cod, nom, s;
+        Nodo aux = ini;
+        num = 0;
+        //Colocando el Encabezado
+        Encabezado();
+        //Recorriendo la lista
+        while(aux != null){
+            cod=aux.codigo;
+            nom=aux.nombre;
+            s=aux.sueldo;
+            num++;
+            String numera = String.valueOf(num);
+            //modificando el tamaÃ±o de la numeraciÃ³n con espacios en blanco a la izquierda
+            for(int i = String.valueOf(num).length(); i < 5; i++){
+                numera = " " + numera;
+            }
+            //modificando el tamaÃ±o de la cadena cÃ³digo con espacios en blanco a la derecha
+            for(int i = cod.length(); i < 12; i++){
+                cod = cod + " ";
+            }
+            //modificando el tamaÃ±o de la cadena nombre con espacios en blanco a la derecha
+            for(int i = nom.length(); i < 28; i++){
+                nom = nom + " ";
+            }
+            // le damos formato al sueldo solo con dos decimales
+            DecimalFormat df2 = new DecimalFormat("####.00");
+            s = df2.format(Double.valueOf(s));
+            //modificando el tamaÃ±o de la cadena sueldo con espacios en blanco a la izquierda
+            for(int i = s.length(); i < 12; i++){
+                s = "  " + s;
+            }
+            //Colocando la informaciÃ³n en el TextArea
+            jTextReporte.append(numera + "  " + cod + nom + s + "\n");
+            aux = aux.sig;
         }
     }
     
@@ -223,15 +265,21 @@ public class RegistroEmpleados extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
+        String campo;
+        
         // Capturamos la informacion de los Objetos
         String cod = jTextCod.getText();
         String nom = jTextNom.getText().toUpperCase();
         String suel = jTextSueldo.getText();
         
-        //Creamos el nodo de la lista en memoria y colocamos la informacion
-        ini = InsertarInicio(ini, cod, nom, suel);
-        LimpiarEntradas();
-        VerDatos();
+        campo = VerificaCampos();
+         
+         if(campo.equals("")){
+            //Creamos el nodo de la lista en memoria y colocamos la informacion
+            ini = InsertarInicio(ini, cod, nom, suel);
+            LimpiarEntradas();
+            VerDatos();
+         } else JOptionPane.showMessageDialog(null, "Verifique los datos en el campo de "+campo);
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void jBSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSalirActionPerformed
@@ -240,7 +288,7 @@ public class RegistroEmpleados extends javax.swing.JFrame {
 
     private void jBActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActualizarActionPerformed
         pFound.codigo = jTextCod.getText();
-        pFound.nombre = jTextNom.getText();
+        pFound.nombre = jTextNom.getText().toUpperCase();
         pFound.sueldo = jTextSueldo.getText();
         LimpiarEntradas();
         Deshabilitar();
