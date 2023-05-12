@@ -1,5 +1,5 @@
 
-package Interfaz;
+package EjercicioGuiado;
 import java.awt.Font;
 import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
